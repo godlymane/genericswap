@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Drug {
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  tradeName         String    @map("trade_name")
+  activeIngredient  String    @map("active_ingredient")
+  dosageForm        String?   @map("dosage_form")
+  route             String?
+  strength          String?
+  applicant         String?
+  applicationType   String    @map("application_type") // "N" = brand NDA, "A" = generic ANDA
+  applicationNumber String    @map("application_number")
+  productNumber     String?   @map("product_number")
+  teCode            String?   @map("te_code")
+  approvalDate      DateTime? @map("approval_date")
+  isRLD             Boolean   @default(false) @map("is_rld")
+  isDiscontinued    Boolean   @default(false) @map("is_discontinued")
+
+  @@unique([applicationNumber, productNumber])
+  @@index([activeIngredient])
+  @@index([applicationType])
+  @@index([tradeName])
+  @@index([slug])
+  @@index([isRLD])
+  @@map("drugs")
+}
+
+model Patent {
+  id                String    @id @default(cuid())
+  applicationNumber String    @map("application_number")
+  patentNumber      String    @map("patent_number")
+  patentExpireDate  DateTime? @map("patent_expire_date")
+  drugSubstanceFlag Boolean?  @map("drug_substance_flag")
+  drugProductFlag   Boolean?  @map("drug_product_flag")
+  patentUseCode     String?   @map("patent_use_code")
+
+  @@index([applicationNumber])
+  @@map("patents")
+}
+
+model Exclusivity {
+  id                String    @id @default(cuid())
+  applicationNumber String    @map("application_number")
+  exclusivityCode   String?   @map("exclusivity_code")
+  exclusivityDate   DateTime? @map("exclusivity_date")
+
+  @@index([applicationNumber])
+  @@map("exclusivities")
+}
+
+model Subscriber {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  drugSlug        String?   @map("drug_slug") // optional: alert for specific drug
+  activeIngredient String?  @map("active_ingredient")
+  alertType       String    @default("patent_expiry") @map("alert_type") // patent_expiry, new_generic, newsletter
+  verified        Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([drugSlug])
+  @@index([alertType])
+  @@map("subscribers")
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  name      String
+  email     String
+  requests  Int      @default(0)
+  rateLimit Int      @default(100) @map("rate_limit") // per hour
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("api_keys")
+}
