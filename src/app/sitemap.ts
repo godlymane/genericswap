@@ -17,8 +17,11 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
   const proto = h.get("x-forwarded-proto") || "https";
   const baseUrl = `${proto}://${host}`;
 
+  // Coerce id to number — Next.js may pass it as a string from the URL param
+  const sitemapId = Number(id);
+
   // Sitemap 0: Static + Category + Generic ingredient pages (~5K URLs)
-  if (id === 0) {
+  if (sitemapId === 0) {
     const staticPages: MetadataRoute.Sitemap = [
       { url: baseUrl, lastModified: new Date(), changeFrequency: "daily", priority: 1.0 },
       { url: `${baseUrl}/about`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
@@ -54,7 +57,7 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
   }
 
   // Sitemap 1: Drug pages (~49K URLs)
-  if (id === 1) {
+  if (sitemapId === 1) {
     const drugSlugs = await prisma.drug.findMany({
       select: { slug: true },
       distinct: ["slug"],
