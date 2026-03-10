@@ -4,8 +4,9 @@ import NewsletterSignup from "@/components/NewsletterSignup";
 import HeroCanvasWrapper from "@/components/HeroCanvasWrapper";
 import TypedDrugName from "@/components/TypedDrugName";
 import HeroStats from "@/components/HeroStats";
-import AnimatedCounter from "@/components/AnimatedCounter";
 import ScrollReveal from "@/components/ScrollReveal";
+import TrustBadges from "@/components/TrustBadges";
+import SocialProof from "@/components/SocialProof";
 import { DRUG_CATEGORIES, POPULAR_DRUGS, SITE_NAME } from "@/lib/constants";
 import { getPopularDrugs, getStats } from "@/lib/queries";
 import { generateMeta } from "@/lib/seo";
@@ -288,45 +289,21 @@ export default async function HomePage() {
       </section>
 
       {/* ═══════════════════════════════════════════════
-          STATS BAR — Animated counters on gradient
+          SOCIAL PROOF — Stats + Testimonials
       ═══════════════════════════════════════════════ */}
-      <section className="bg-gradient-to-r from-brand-600 via-blue-600 to-indigo-700 py-16 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBvcGFjaXR5PSIwLjA1Ij48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIxIiBmaWxsPSJ3aGl0ZSIvPjwvZz48L3N2Zz4=')] opacity-50" />
-        <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 text-center relative">
-          <StatCard label="Total Drugs" value={stats.totalDrugs} />
-          <StatCard label="Brand Drugs" value={stats.brandDrugs} />
-          <StatCard label="Generic Drugs" value={stats.genericDrugs} />
-          <StatCard label="Active Patents" value={stats.totalPatents} />
-        </div>
+      <section className="max-w-5xl mx-auto px-4 py-16">
+        <ScrollReveal>
+          <SocialProof />
+        </ScrollReveal>
       </section>
 
       {/* ═══════════════════════════════════════════════
-          TRUST BAR — Data sources
+          TRUST BADGES — Data sources & credentials
       ═══════════════════════════════════════════════ */}
-      <section className="bg-white border-y border-gray-100 py-10 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Powered By</p>
-          <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
-            <div className="flex items-center gap-2 text-gray-600">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              <span className="text-sm font-medium">FDA Orange Book</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375" />
-              </svg>
-              <span className="text-sm font-medium">42,000+ Drug Records</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-600">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span className="text-sm font-medium">Updated Weekly</span>
-            </div>
-          </div>
-        </div>
+      <section className="max-w-5xl mx-auto px-4 pb-16">
+        <ScrollReveal animation="fade-up">
+          <TrustBadges />
+        </ScrollReveal>
       </section>
 
       {/* ═══════════════════════════════════════════════
@@ -423,17 +400,3 @@ function ExplainerCard({ question, answer, icon }: { question: string; answer: s
   );
 }
 
-function StatCard({ label, value }: { label: string; value: number }) {
-  return (
-    <ScrollReveal animation="scale-in">
-      <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:bg-white/15 transition-colors">
-        <AnimatedCounter
-          value={value}
-          duration={2500}
-          className="text-3xl font-bold text-white tabular-nums"
-        />
-        <p className="text-sm text-blue-200 mt-2">{label}</p>
-      </div>
-    </ScrollReveal>
-  );
-}
