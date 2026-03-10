@@ -72,7 +72,7 @@ export default function SearchBar({ size = "default" }: { size?: "default" | "la
 
   const inputClass =
     size === "large"
-      ? "w-full px-6 py-4 text-lg rounded-xl border-2 border-gray-200 focus:border-brand-500 focus:outline-none shadow-sm"
+      ? "w-full px-6 py-4 pr-28 text-lg rounded-2xl border border-white/20 bg-white/10 backdrop-blur-md text-white placeholder-slate-400 focus:border-cyan-400/50 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-cyan-400/20 shadow-2xl shadow-black/20 transition-all"
       : "w-full px-4 py-2.5 text-sm rounded-lg border border-gray-300 focus:border-brand-500 focus:outline-none";
 
   return (
@@ -90,7 +90,11 @@ export default function SearchBar({ size = "default" }: { size?: "default" | "la
           />
           <button
             type="submit"
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-brand-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-700 transition-colors"
+            className={`absolute right-2 top-1/2 -translate-y-1/2 text-sm font-semibold transition-all ${
+              size === "large"
+                ? "px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white hover:from-cyan-400 hover:to-blue-400 shadow-lg shadow-cyan-500/25"
+                : "px-4 py-2 rounded-lg bg-brand-600 text-white hover:bg-brand-700"
+            }`}
           >
             Search
           </button>

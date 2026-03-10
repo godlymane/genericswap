@@ -37,8 +37,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export async function generateStaticParams() {
   const slugs = await getAllBrandDrugSlugs();
-  // Pre-generate top 5000 brand drug pages
-  return slugs.slice(0, 5000).map((s) => ({ slug: s.slug }));
+  // Pre-generate top 200 brand drug pages; rest are ISR on-demand
+  return slugs.slice(0, 200).map((s) => ({ slug: s.slug }));
 }
 
 export default async function DrugPage({ params }: PageProps) {

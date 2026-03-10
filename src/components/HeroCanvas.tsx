@@ -308,7 +308,7 @@ function Scene() {
 // ── Exported component ──
 export default function HeroCanvas() {
   return (
-    <div className="w-full h-full absolute inset-0 -z-10">
+    <div className="w-full h-full absolute inset-0 z-0">
       <Canvas
         camera={{ position: [0, 0, 5], fov: 50 }}
         dpr={[1, 2]}

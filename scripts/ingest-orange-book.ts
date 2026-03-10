@@ -3,16 +3,14 @@ import * as fs from "fs";
 import * as path from "path";
 import * as https from "https";
 import * as http from "http";
+import AdmZip from "adm-zip";
 
 const prisma = new PrismaClient();
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
-const FDA_URLS = {
-  products: "https://www.fda.gov/media/76860/download",
-  patents: "https://www.fda.gov/media/76861/download",
-  exclusivity: "https://www.fda.gov/media/76862/download",
-};
+// All three files come bundled in a single ZIP from the FDA
+const FDA_ZIP_URL = "https://www.fda.gov/media/76860/download";
 
 // --- Helpers ---
 
@@ -84,21 +82,28 @@ async function ensureDataFiles(): Promise<void> {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
 
-  const files = [
-    { key: "products" as const, filename: "products.txt" },
-    { key: "patents" as const, filename: "patent.txt" },
-    { key: "exclusivity" as const, filename: "exclusivity.txt" },
-  ];
+  const requiredFiles = ["products.txt", "patent.txt", "exclusivity.txt"];
+  const allExist = requiredFiles.every((f) => fs.existsSync(path.join(DATA_DIR, f)));
 
-  for (const f of files) {
-    const filePath = path.join(DATA_DIR, f.filename);
-    if (!fs.existsSync(filePath)) {
-      console.log(`Downloading ${f.filename}...`);
-      await downloadFile(FDA_URLS[f.key], filePath);
-      console.log(`Downloaded ${f.filename}`);
-    } else {
-      console.log(`${f.filename} already exists, skipping download.`);
-    }
+  if (allExist) {
+    console.log("All data files already exist, skipping download.");
+    return;
+  }
+
+  const zipPath = path.join(DATA_DIR, "orangebook.zip");
+  console.log("Downloading FDA Orange Book ZIP...");
+  await downloadFile(FDA_ZIP_URL, zipPath);
+
+  console.log("Extracting files from ZIP...");
+  const zip = new AdmZip(zipPath);
+  zip.extractAllTo(DATA_DIR, true);
+
+  // Clean up zip
+  fs.unlinkSync(zipPath);
+
+  for (const f of requiredFiles) {
+    const exists = fs.existsSync(path.join(DATA_DIR, f));
+    console.log(`  ${f}: ${exists ? "OK" : "MISSING"}`);
   }
 }
 
