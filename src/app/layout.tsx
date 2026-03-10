@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
 import PrefetchLinks from "@/components/PrefetchLinks";
+import CookieConsent from "@/components/CookieConsent";
 import { Toaster } from "sonner";
 import "@/styles/globals.css";
 
@@ -51,6 +52,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           </>
         )}
+        {process.env.NEXT_PUBLIC_ADSENSE_PUB_ID && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_PUB_ID}`}
+            crossOrigin="anonymous"
+          />
+        )}
       </head>
       <body className="bg-gray-50 text-gray-900 min-h-screen flex flex-col antialiased">
         <SmoothScroll />
@@ -72,6 +80,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </a>
           .
         </div>
+
+        {/* Cookie consent for GDPR / AdSense compliance */}
+        <CookieConsent />
 
         {/* Toast notifications */}
         <Toaster

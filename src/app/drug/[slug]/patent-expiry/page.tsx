@@ -67,7 +67,7 @@ export default async function PatentExpiryPage({ params }: PageProps) {
         drugName={drug.tradeName}
       />
 
-      <AdSlot id="ad-in-content-1" />
+      <AdSlot slot="in-content-1" />
 
       {/* Patents Detail Table */}
       {drug.patents.length > 0 && (
@@ -167,7 +167,7 @@ export default async function PatentExpiryPage({ params }: PageProps) {
         </Link>
       </div>
 
-      <AdSlot id="ad-below-content" />
+      <AdSlot slot="below-content" format="horizontal" />
 
       <script
         type="application/ld+json"

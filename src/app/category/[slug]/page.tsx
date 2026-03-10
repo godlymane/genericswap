@@ -84,7 +84,7 @@ export default async function CategoryPage({ params }: PageProps) {
         </div>
       </div>
 
-      <AdSlot id="ad-below-content" />
+      <AdSlot slot="below-content" format="horizontal" />
 
       {/* Related categories */}
       <div className="mt-8 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">

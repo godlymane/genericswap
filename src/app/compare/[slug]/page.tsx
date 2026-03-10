@@ -141,7 +141,7 @@ export default async function ComparePage({ params }: PageProps) {
         </div>
       </div>
 
-      <AdSlot id="ad-in-content-1" />
+      <AdSlot slot="in-content-1" />
 
       {/* Key Differences */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mt-8">
@@ -187,7 +187,7 @@ export default async function ComparePage({ params }: PageProps) {
         </p>
       </div>
 
-      <AdSlot id="ad-in-content-2" />
+      <AdSlot slot="in-content-2" />
 
       {/* Affiliate */}
       <div className="mt-8">
@@ -202,7 +202,7 @@ export default async function ComparePage({ params }: PageProps) {
         <FAQSection items={faqItems} drugName={`${drug1.tradeName} vs ${drug2.tradeName}`} />
       </div>
 
-      <AdSlot id="ad-below-content" />
+      <AdSlot slot="below-content" format="horizontal" />
 
       <script
         type="application/ld+json"

@@ -177,7 +177,7 @@ export default async function DrugPage({ params }: PageProps) {
       </div>
 
       {/* Ad Slot 1 */}
-      <AdSlot id="ad-in-content-1" />
+      <AdSlot slot="in-content-1" />
 
       {/* Generic Equivalents Table */}
       <ScrollReveal animation="fade-up" className="mt-8">
@@ -227,7 +227,7 @@ export default async function DrugPage({ params }: PageProps) {
       </ScrollReveal>
 
       {/* Ad Slot 2 */}
-      <AdSlot id="ad-in-content-2" />
+      <AdSlot slot="in-content-2" />
 
       {/* Affiliate CTA */}
       {generics.length > 0 && (
@@ -262,7 +262,7 @@ export default async function DrugPage({ params }: PageProps) {
       </ScrollReveal>
 
       {/* Ad Slot 3 */}
-      <AdSlot id="ad-below-content" />
+      <AdSlot slot="below-content" format="horizontal" />
 
       {/* JSON-LD Structured Data */}
       <script

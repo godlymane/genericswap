@@ -89,7 +89,7 @@ export default async function GenericIngredientPage({ params }: PageProps) {
       {/* Affiliate CTA */}
       <AffiliateCTA activeIngredient={ingredient} tradeName={brandDrugs[0]?.tradeName || ingredient} />
 
-      <AdSlot id="ad-in-content-1" />
+      <AdSlot slot="in-content-1" />
 
       {/* Generic Manufacturers Table */}
       {genericDrugs.length > 0 && (
@@ -144,7 +144,7 @@ export default async function GenericIngredientPage({ params }: PageProps) {
         </div>
       )}
 
-      <AdSlot id="ad-below-content" />
+      <AdSlot slot="below-content" format="horizontal" />
 
       <script
         type="application/ld+json"
