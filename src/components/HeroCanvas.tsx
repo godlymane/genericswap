@@ -1,239 +1,139 @@
 "use client";
 
-import { useRef, useState, useMemo, useCallback } from "react";
+import { useRef, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { MathUtils, Vector3 } from "three";
-import type { Mesh, Group } from "three";
+import { MathUtils, Vector3, Color } from "three";
+import type { Mesh, Group, InstancedMesh } from "three";
+import { Float } from "@react-three/drei";
+import * as THREE from "three";
 
-// ── Target positions for the 15 generic capsules in a sphere formation ──
-function generateOrbitPositions(count: number, radius: number): Vector3[] {
-  const positions: Vector3[] = [];
-  const goldenAngle = Math.PI * (3 - Math.sqrt(5));
-  for (let i = 0; i < count; i++) {
-    const y = 1 - (i / (count - 1)) * 2;
-    const r = Math.sqrt(1 - y * y);
-    const theta = goldenAngle * i;
-    positions.push(
-      new Vector3(Math.cos(theta) * r * radius, y * radius, Math.sin(theta) * r * radius)
-    );
-  }
-  return positions;
-}
-
-// ── Single capsule mesh ──
-function Capsule({
-  position,
-  targetPosition,
-  isDispersed,
-  mousePos,
-  index,
-  scale,
-  color,
-  emissive,
-  emissiveIntensity,
-}: {
-  position: [number, number, number];
-  targetPosition: Vector3;
-  isDispersed: boolean;
-  mousePos: React.MutableRefObject<{ x: number; y: number }>;
-  index: number;
-  scale: number;
-  color: string;
-  emissive: string;
-  emissiveIntensity: number;
-}) {
-  const meshRef = useRef<Mesh>(null);
-  const currentPos = useRef(new Vector3(...position));
-  const currentScale = useRef(scale);
-  const rotationSpeed = useRef(0.002 + Math.random() * 0.005);
-  const phaseOffset = useRef(Math.random() * Math.PI * 2);
-
-  useFrame((state) => {
-    if (!meshRef.current) return;
-
-    const time = state.clock.elapsedTime;
-    const lerpFactor = 0.03 + index * 0.002;
-
-    if (isDispersed) {
-      // Float around mouse position with offset
-      const mouseInfluence = 0.3;
-      const targetX =
-        targetPosition.x + mousePos.current.x * mouseInfluence;
-      const targetY =
-        targetPosition.y + mousePos.current.y * mouseInfluence;
-      const targetZ = targetPosition.z;
-
-      // Add gentle floating motion
-      const floatX = Math.sin(time * 0.5 + phaseOffset.current) * 0.15;
-      const floatY = Math.cos(time * 0.7 + phaseOffset.current) * 0.1;
-
-      currentPos.current.x = MathUtils.lerp(
-        currentPos.current.x,
-        targetX + floatX,
-        lerpFactor
-      );
-      currentPos.current.y = MathUtils.lerp(
-        currentPos.current.y,
-        targetY + floatY,
-        lerpFactor
-      );
-      currentPos.current.z = MathUtils.lerp(
-        currentPos.current.z,
-        targetZ,
-        lerpFactor
-      );
-
-      currentScale.current = MathUtils.lerp(currentScale.current, scale, 0.05);
-    } else {
-      // Merge back to center
-      currentPos.current.x = MathUtils.lerp(currentPos.current.x, 0, 0.04);
-      currentPos.current.y = MathUtils.lerp(currentPos.current.y, 0, 0.04);
-      currentPos.current.z = MathUtils.lerp(currentPos.current.z, 0, 0.04);
-
-      currentScale.current = MathUtils.lerp(
-        currentScale.current,
-        index === 0 ? scale : 0,
-        0.05
-      );
-    }
-
-    meshRef.current.position.copy(currentPos.current);
-    meshRef.current.scale.setScalar(Math.max(currentScale.current, 0.001));
-
-    // Rotate
-    meshRef.current.rotation.x += rotationSpeed.current;
-    meshRef.current.rotation.z += rotationSpeed.current * 0.5;
-  });
-
-  return (
-    <mesh ref={meshRef} position={position}>
-      <capsuleGeometry args={[0.15, 0.4, 8, 16]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={emissive}
-        emissiveIntensity={emissiveIntensity}
-        roughness={0.2}
-        metalness={0.8}
-      />
-    </mesh>
-  );
-}
-
-// ── Main gold capsule that shows when not dispersed ──
-function GoldCapsule({
-  isDispersed,
-}: {
-  isDispersed: boolean;
-}) {
-  const meshRef = useRef<Mesh>(null);
-  const currentScale = useRef(1);
-
-  useFrame((state) => {
-    if (!meshRef.current) return;
-    const time = state.clock.elapsedTime;
-
-    // Scale down when dispersed
-    const targetScale = isDispersed ? 0 : 1;
-    currentScale.current = MathUtils.lerp(currentScale.current, targetScale, 0.05);
-    meshRef.current.scale.setScalar(Math.max(currentScale.current, 0.001));
-
-    // Slow elegant rotation
-    meshRef.current.rotation.x = Math.sin(time * 0.3) * 0.3;
-    meshRef.current.rotation.y = time * 0.15;
-    meshRef.current.rotation.z = Math.cos(time * 0.2) * 0.1;
-
-    // Gentle float
-    meshRef.current.position.y = Math.sin(time * 0.5) * 0.1;
-  });
-
-  return (
-    <mesh ref={meshRef}>
-      <capsuleGeometry args={[0.25, 0.6, 12, 24]} />
-      <meshStandardMaterial
-        color="#d4a843"
-        emissive="#b8860b"
-        emissiveIntensity={0.6}
-        roughness={0.15}
-        metalness={0.9}
-      />
-    </mesh>
-  );
-}
-
-// ── Mouse-following point light ──
-function MouseLight({
-  mousePos,
-}: {
-  mousePos: React.MutableRefObject<{ x: number; y: number }>;
-}) {
-  const lightRef = useRef<any>(null);
-
-  useFrame(() => {
-    if (!lightRef.current) return;
-    lightRef.current.position.x = MathUtils.lerp(
-      lightRef.current.position.x,
-      mousePos.current.x * 3,
-      0.05
-    );
-    lightRef.current.position.y = MathUtils.lerp(
-      lightRef.current.position.y,
-      mousePos.current.y * 3,
-      0.05
-    );
-  });
-
-  return (
-    <pointLight
-      ref={lightRef}
-      position={[0, 0, 3]}
-      intensity={1.5}
-      color="#88ccff"
-      distance={10}
-    />
-  );
-}
-
-// ── Floating ambient particles ──
-function Particles() {
+// ── DNA-style double helix of capsules ──
+function HelixCapsules() {
   const groupRef = useRef<Group>(null);
-  const count = 60;
+  const capsuleCount = 28;
 
-  const particles = useMemo(() => {
-    return Array.from({ length: count }, (_, i) => ({
-      position: [
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 6,
-        (Math.random() - 0.5) * 6,
-      ] as [number, number, number],
-      scale: Math.random() * 0.02 + 0.005,
-      speed: Math.random() * 0.2 + 0.1,
-      phase: Math.random() * Math.PI * 2,
-    }));
+  const capsules = useMemo(() => {
+    return Array.from({ length: capsuleCount }, (_, i) => {
+      const t = (i / capsuleCount) * Math.PI * 4; // 2 full rotations
+      const yPos = (i / capsuleCount) * 8 - 4; // spread vertically
+      const strand = i % 2 === 0 ? 1 : -1;
+      const radius = 1.2;
+
+      return {
+        basePosition: [
+          Math.cos(t) * radius * strand,
+          yPos,
+          Math.sin(t) * radius,
+        ] as [number, number, number],
+        rotation: [t * 0.3, t, 0] as [number, number, number],
+        scale: 0.35 + Math.sin(i * 0.4) * 0.1,
+        color: strand === 1 ? "#22d3ee" : "#3b82f6",
+        emissive: strand === 1 ? "#06b6d4" : "#2563eb",
+        phaseOffset: i * 0.15,
+        strand,
+      };
+    });
   }, []);
 
   useFrame((state) => {
     if (!groupRef.current) return;
-    const time = state.clock.elapsedTime;
+    const t = state.clock.elapsedTime;
+    // Slow rotation of entire helix
+    groupRef.current.rotation.y = t * 0.08;
+
     groupRef.current.children.forEach((child, i) => {
-      const p = particles[i];
-      child.position.y =
-        p.position[1] + Math.sin(time * p.speed + p.phase) * 0.3;
-      child.position.x =
-        p.position[0] + Math.cos(time * p.speed * 0.5 + p.phase) * 0.1;
+      const cap = capsules[i];
+      if (!cap) return;
+      // Gentle breathing / pulsing motion
+      const pulse = Math.sin(t * 0.8 + cap.phaseOffset) * 0.06;
+      child.position.y = cap.basePosition[1] + Math.sin(t * 0.4 + cap.phaseOffset) * 0.15;
+      child.scale.setScalar(cap.scale + pulse);
+      child.rotation.x = cap.rotation[0] + t * 0.15;
+      child.rotation.z = t * 0.1 + cap.phaseOffset;
     });
   });
 
   return (
-    <group ref={groupRef}>
-      {particles.map((p, i) => (
-        <mesh key={i} position={p.position} scale={p.scale}>
-          <sphereGeometry args={[1, 6, 6]} />
+    <group ref={groupRef} position={[3.5, 0, -1]} rotation={[0.3, 0, 0.15]}>
+      {capsules.map((cap, i) => (
+        <mesh key={i} position={cap.basePosition} rotation={cap.rotation} scale={cap.scale}>
+          <capsuleGeometry args={[0.12, 0.35, 8, 16]} />
           <meshStandardMaterial
-            color="#94a3b8"
-            emissive="#64748b"
-            emissiveIntensity={0.4}
+            color={cap.color}
+            emissive={cap.emissive}
+            emissiveIntensity={0.6}
+            roughness={0.15}
+            metalness={0.85}
             transparent
-            opacity={0.5}
+            opacity={0.9}
+          />
+        </mesh>
+      ))}
+      {/* Connection lines between strands */}
+      {capsules.filter((_, i) => i % 4 === 0 && i + 1 < capsuleCount).map((cap, i) => {
+        const next = capsules[i * 4 + 1];
+        if (!next) return null;
+        return (
+          <mesh key={`conn-${i}`} position={[
+            (cap.basePosition[0] + next.basePosition[0]) / 2,
+            (cap.basePosition[1] + next.basePosition[1]) / 2,
+            (cap.basePosition[2] + next.basePosition[2]) / 2,
+          ]}>
+            <sphereGeometry args={[0.03, 6, 6]} />
+            <meshStandardMaterial color="#94a3b8" emissive="#64748b" emissiveIntensity={0.5} transparent opacity={0.4} />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+// ── Orbiting ring of pills ──
+function OrbitRing({ radius, count, speed, yOffset, color, emissive }: {
+  radius: number; count: number; speed: number; yOffset: number; color: string; emissive: string;
+}) {
+  const groupRef = useRef<Group>(null);
+
+  const pills = useMemo(() => {
+    return Array.from({ length: count }, (_, i) => ({
+      angle: (i / count) * Math.PI * 2,
+      scaleBase: 0.2 + Math.random() * 0.15,
+      floatPhase: Math.random() * Math.PI * 2,
+    }));
+  }, [count]);
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const t = state.clock.elapsedTime;
+    groupRef.current.rotation.y = t * speed;
+
+    groupRef.current.children.forEach((child, i) => {
+      const p = pills[i];
+      if (!p) return;
+      const float = Math.sin(t * 0.6 + p.floatPhase) * 0.08;
+      child.position.y = float;
+      child.rotation.x = t * 0.3 + p.angle;
+      child.rotation.z = t * 0.2;
+    });
+  });
+
+  return (
+    <group ref={groupRef} position={[-2.5, yOffset, 0]} rotation={[0.5, 0, 0.3]}>
+      {pills.map((p, i) => (
+        <mesh
+          key={i}
+          position={[Math.cos(p.angle) * radius, 0, Math.sin(p.angle) * radius]}
+          scale={p.scaleBase}
+        >
+          <capsuleGeometry args={[0.15, 0.3, 6, 12]} />
+          <meshStandardMaterial
+            color={color}
+            emissive={emissive}
+            emissiveIntensity={0.5}
+            roughness={0.2}
+            metalness={0.8}
+            transparent
+            opacity={0.85}
           />
         </mesh>
       ))}
@@ -241,66 +141,216 @@ function Particles() {
   );
 }
 
-// ── Scene container ──
-function Scene() {
-  const [isDispersed, setIsDispersed] = useState(false);
+// ── Floating molecule-like nodes ──
+function MoleculeNodes() {
+  const groupRef = useRef<Group>(null);
+
+  const nodes = useMemo(() => {
+    const pts: { pos: [number, number, number]; size: number; color: string; phase: number }[] = [];
+    for (let i = 0; i < 12; i++) {
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.random() * Math.PI;
+      const r = 2 + Math.random() * 3;
+      pts.push({
+        pos: [
+          Math.sin(phi) * Math.cos(theta) * r - 1,
+          Math.sin(phi) * Math.sin(theta) * r * 0.6,
+          Math.cos(phi) * r * 0.5 - 2,
+        ],
+        size: 0.04 + Math.random() * 0.06,
+        color: ["#22d3ee", "#3b82f6", "#a78bfa", "#34d399"][Math.floor(Math.random() * 4)],
+        phase: Math.random() * Math.PI * 2,
+      });
+    }
+    return pts;
+  }, []);
+
+  useFrame((state) => {
+    if (!groupRef.current) return;
+    const t = state.clock.elapsedTime;
+    groupRef.current.children.forEach((child, i) => {
+      const n = nodes[i];
+      if (!n) return;
+      child.position.x = n.pos[0] + Math.sin(t * 0.3 + n.phase) * 0.3;
+      child.position.y = n.pos[1] + Math.cos(t * 0.4 + n.phase) * 0.25;
+      const pulse = 1 + Math.sin(t * 1.5 + n.phase) * 0.3;
+      child.scale.setScalar(n.size * pulse);
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      {nodes.map((n, i) => (
+        <mesh key={i} position={n.pos}>
+          <sphereGeometry args={[1, 8, 8]} />
+          <meshStandardMaterial
+            color={n.color}
+            emissive={n.color}
+            emissiveIntensity={1.2}
+            transparent
+            opacity={0.7}
+          />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+// ── Floating particle dust ──
+function ParticleDust() {
+  const meshRef = useRef<InstancedMesh>(null);
+  const count = 120;
+
+  const particles = useMemo(() => {
+    return Array.from({ length: count }, () => ({
+      pos: new Vector3(
+        (Math.random() - 0.5) * 14,
+        (Math.random() - 0.5) * 8,
+        (Math.random() - 0.5) * 8,
+      ),
+      speed: 0.1 + Math.random() * 0.3,
+      phase: Math.random() * Math.PI * 2,
+      size: 0.008 + Math.random() * 0.015,
+    }));
+  }, []);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const t = state.clock.elapsedTime;
+    const dummy = new THREE.Object3D();
+
+    for (let i = 0; i < count; i++) {
+      const p = particles[i];
+      dummy.position.set(
+        p.pos.x + Math.sin(t * p.speed + p.phase) * 0.5,
+        p.pos.y + Math.cos(t * p.speed * 0.7 + p.phase) * 0.4,
+        p.pos.z + Math.sin(t * p.speed * 0.3 + p.phase) * 0.3,
+      );
+      dummy.scale.setScalar(p.size * (1 + Math.sin(t * 2 + p.phase) * 0.3));
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  });
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
+      <sphereGeometry args={[1, 4, 4]} />
+      <meshStandardMaterial
+        color="#94a3b8"
+        emissive="#64748b"
+        emissiveIntensity={0.8}
+        transparent
+        opacity={0.4}
+      />
+    </instancedMesh>
+  );
+}
+
+// ── Interactive mouse-reactive glow ──
+function MouseGlow() {
+  const lightRef = useRef<any>(null);
   const mousePos = useRef({ x: 0, y: 0 });
   const { viewport } = useThree();
 
-  const CAPSULE_COUNT = 15;
-  const orbitPositions = useMemo(
-    () => generateOrbitPositions(CAPSULE_COUNT, 2),
-    []
-  );
+  useFrame((state) => {
+    if (!lightRef.current) return;
+    // Get mouse position from pointer events on the canvas
+    const pointer = state.pointer;
+    mousePos.current.x = MathUtils.lerp(mousePos.current.x, pointer.x * viewport.width * 0.5, 0.05);
+    mousePos.current.y = MathUtils.lerp(mousePos.current.y, pointer.y * viewport.height * 0.5, 0.05);
 
-  const handlePointerMove = useCallback(
-    (e: any) => {
-      mousePos.current.x = (e.point.x / viewport.width) * 4;
-      mousePos.current.y = (e.point.y / viewport.height) * 4;
-    },
-    [viewport]
-  );
+    lightRef.current.position.x = mousePos.current.x;
+    lightRef.current.position.y = mousePos.current.y;
+    lightRef.current.position.z = 3;
+  });
 
   return (
-    <>
-      {/* Lighting */}
-      <ambientLight intensity={0.15} color="#e2e8f0" />
-      <directionalLight position={[5, 5, 5]} intensity={0.4} color="#f8fafc" />
-      <pointLight position={[-3, 2, 4]} intensity={0.6} color="#c084fc" distance={12} />
-      <MouseLight mousePos={mousePos} />
+    <pointLight
+      ref={lightRef}
+      position={[0, 0, 3]}
+      intensity={2}
+      color="#22d3ee"
+      distance={8}
+    />
+  );
+}
 
-      {/* Invisible interaction plane */}
-      <mesh
-        onPointerMove={handlePointerMove}
-        onPointerEnter={() => setIsDispersed(true)}
-        onPointerLeave={() => setIsDispersed(false)}
-        visible={false}
-      >
-        <planeGeometry args={[20, 12]} />
-        <meshBasicMaterial transparent opacity={0} />
+// ── Large floating hero capsule (center-left) ──
+function HeroCapsule() {
+  const meshRef = useRef<Mesh>(null);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const t = state.clock.elapsedTime;
+    meshRef.current.rotation.x = Math.sin(t * 0.2) * 0.15 + 0.3;
+    meshRef.current.rotation.y = t * 0.1;
+    meshRef.current.rotation.z = Math.cos(t * 0.15) * 0.1 + 0.2;
+    meshRef.current.position.y = Math.sin(t * 0.3) * 0.15;
+  });
+
+  return (
+    <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.3}>
+      <mesh ref={meshRef} position={[-3, 0.5, 1]} scale={1.1}>
+        {/* Two-tone capsule using groups */}
+        <group>
+          <mesh position={[0, 0.2, 0]}>
+            <capsuleGeometry args={[0.28, 0.15, 12, 24]} />
+            <meshStandardMaterial
+              color="#22d3ee"
+              emissive="#06b6d4"
+              emissiveIntensity={0.5}
+              roughness={0.1}
+              metalness={0.9}
+            />
+          </mesh>
+          <mesh position={[0, -0.2, 0]}>
+            <capsuleGeometry args={[0.28, 0.15, 12, 24]} />
+            <meshStandardMaterial
+              color="#3b82f6"
+              emissive="#2563eb"
+              emissiveIntensity={0.5}
+              roughness={0.1}
+              metalness={0.9}
+            />
+          </mesh>
+          {/* Shine stripe */}
+          <mesh position={[0.15, 0, 0.2]} rotation={[0, 0, 0.3]} scale={[0.03, 0.5, 0.01]}>
+            <boxGeometry />
+            <meshStandardMaterial color="white" emissive="white" emissiveIntensity={0.6} transparent opacity={0.3} />
+          </mesh>
+        </group>
       </mesh>
+    </Float>
+  );
+}
 
-      {/* Main gold capsule */}
-      <GoldCapsule isDispersed={isDispersed} />
+// ── Scene ──
+function Scene() {
+  return (
+    <>
+      {/* Ambient lighting */}
+      <ambientLight intensity={0.12} color="#e2e8f0" />
+      <directionalLight position={[5, 5, 5]} intensity={0.35} color="#f8fafc" />
+      <pointLight position={[-4, 3, 4]} intensity={0.5} color="#a78bfa" distance={15} />
+      <pointLight position={[4, -2, 3]} intensity={0.4} color="#22d3ee" distance={12} />
+      <MouseGlow />
 
-      {/* 15 generic capsules */}
-      {orbitPositions.map((pos, i) => (
-        <Capsule
-          key={i}
-          index={i}
-          position={[0, 0, 0]}
-          targetPosition={pos}
-          isDispersed={isDispersed}
-          mousePos={mousePos}
-          scale={0.7}
-          color="#22d3ee"
-          emissive="#06b6d4"
-          emissiveIntensity={0.5}
-        />
-      ))}
+      {/* Main hero capsule */}
+      <HeroCapsule />
 
-      {/* Ambient particles */}
-      <Particles />
+      {/* DNA helix on the right side */}
+      <HelixCapsules />
+
+      {/* Orbiting rings */}
+      <OrbitRing radius={1.8} count={8} speed={0.15} yOffset={-0.5} color="#22d3ee" emissive="#06b6d4" />
+      <OrbitRing radius={1.3} count={6} speed={-0.1} yOffset={0.8} color="#a78bfa" emissive="#7c3aed" />
+
+      {/* Molecular nodes */}
+      <MoleculeNodes />
+
+      {/* Background particle dust */}
+      <ParticleDust />
     </>
   );
 }
@@ -310,8 +360,8 @@ export default function HeroCanvas() {
   return (
     <div className="w-full h-full absolute inset-0 z-0">
       <Canvas
-        camera={{ position: [0, 0, 5], fov: 50 }}
-        dpr={[1, 2]}
+        camera={{ position: [0, 0, 6], fov: 45 }}
+        dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
         style={{ background: "transparent" }}
       >
