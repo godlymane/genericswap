@@ -3,7 +3,7 @@ import { getUpcomingPatentCliffs } from "@/lib/queries";
 import { generateMeta } from "@/lib/seo";
 import NewsletterSignup from "@/components/NewsletterSignup";
 
-export const revalidate = 86400; // Daily
+export const dynamic = "force-dynamic"; // Heavy queries — render on-demand, not at build time
 
 export const metadata = generateMeta({
   title: "Patent Cliff Dashboard — Upcoming Drug Patent Expirations",

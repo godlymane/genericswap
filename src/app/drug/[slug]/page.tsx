@@ -36,9 +36,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export async function generateStaticParams() {
-  const slugs = await getAllBrandDrugSlugs();
-  // Pre-generate top 200 brand drug pages; rest are ISR on-demand
-  return slugs.slice(0, 200).map((s) => ({ slug: s.slug }));
+  // All pages generated on-demand via ISR (Neon free tier can't handle concurrent build workers)
+  return [];
 }
 
 export default async function DrugPage({ params }: PageProps) {
