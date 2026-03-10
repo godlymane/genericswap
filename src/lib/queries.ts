@@ -80,8 +80,8 @@ export async function searchDrugs(query: string, limit = 20) {
   return prisma.drug.findMany({
     where: {
       OR: [
-        { tradeName: { contains: query } },
-        { activeIngredient: { contains: query } },
+        { tradeName: { contains: query, mode: "insensitive" } },
+        { activeIngredient: { contains: query, mode: "insensitive" } },
       ],
     },
     distinct: ["tradeName"],
@@ -123,7 +123,7 @@ export async function getDrugsByCategory(keywords: string[]) {
     where: {
       applicationType: "N",
       OR: keywords.map((kw) => ({
-        activeIngredient: { contains: kw },
+        activeIngredient: { contains: kw, mode: "insensitive" as const },
       })),
     },
     distinct: ["tradeName"],
@@ -135,7 +135,9 @@ export async function getDrugsByCategory(keywords: string[]) {
 export async function getPopularDrugs(tradeNames: string[]) {
   return prisma.drug.findMany({
     where: {
-      tradeName: { in: tradeNames },
+      OR: tradeNames.map((name) => ({
+        tradeName: { equals: name, mode: "insensitive" as const },
+      })),
       applicationType: "N",
       isRLD: true,
     },
@@ -151,7 +153,7 @@ export async function getRelatedDrugs(activeIngredient: string, limit = 10) {
     where: {
       applicationType: "N",
       isRLD: true,
-      activeIngredient: { startsWith: prefix },
+      activeIngredient: { startsWith: prefix, mode: "insensitive" },
       NOT: { activeIngredient },
     },
     distinct: ["tradeName"],
@@ -180,18 +182,27 @@ export async function countGenerics(
 export async function getBrandDrugsWithGenericCounts(keywords: string[]) {
   const brands = await getDrugsByCategory(keywords);
 
-  const results = await Promise.all(
-    brands.map(async (drug) => {
-      const genericCount = await countGenerics(
-        drug.activeIngredient,
-        drug.dosageForm,
-        drug.route
-      );
-      return { ...drug, genericCount };
-    })
+  if (brands.length === 0) return [];
+
+  // Batch-count all generics in ONE query instead of N+1 individual counts
+  const uniqueIngredients = [...new Set(brands.map((d) => d.activeIngredient))];
+  const genericCounts = await prisma.drug.groupBy({
+    by: ["activeIngredient"],
+    where: {
+      applicationType: "A",
+      activeIngredient: { in: uniqueIngredients },
+    },
+    _count: true,
+  });
+
+  const countMap = new Map(
+    genericCounts.map((g) => [g.activeIngredient, g._count])
   );
 
-  return results;
+  return brands.map((drug) => ({
+    ...drug,
+    genericCount: countMap.get(drug.activeIngredient) || 0,
+  }));
 }
 
 // Upcoming patent cliffs (expiring in next N years)
@@ -272,14 +283,14 @@ export async function advancedSearch({
         query
           ? {
               OR: [
-                { tradeName: { contains: query } },
-                { activeIngredient: { contains: query } },
+                { tradeName: { contains: query, mode: "insensitive" } },
+                { activeIngredient: { contains: query, mode: "insensitive" } },
               ],
             }
           : {},
         dosageForm ? { dosageForm } : {},
         route ? { route } : {},
-        teCode ? { teCode: { startsWith: teCode } } : {},
+        teCode ? { teCode: { startsWith: teCode, mode: "insensitive" as const } } : {},
         applicationType ? { applicationType } : {},
       ],
     },

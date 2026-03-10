@@ -3,6 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    // Limit build workers to avoid overwhelming Neon free-tier DB
+    cpus: 4,
+  },
   images: {
     formats: ["image/avif", "image/webp"],
   },
