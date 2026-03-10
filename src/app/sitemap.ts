@@ -91,7 +91,19 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
   const proto = h.get("x-forwarded-proto") || "https";
   const baseUrl = `${proto}://${host}`;
 
-  // Use array lookup — works regardless of whether id is number or string
-  const handler = SITEMAP_HANDLERS[Number(id)] ?? sitemapPatents;
-  return handler(baseUrl);
+  const idx = Number(id);
+  const handler = SITEMAP_HANDLERS[idx] ?? sitemapPatents;
+  const entries = await handler(baseUrl);
+
+  // Temporary debug marker — prepend a URL that reveals routing info
+  // so we can diagnose which handler was actually called.
+  // REMOVE THIS after confirming sitemaps route correctly.
+  entries.unshift({
+    url: `${baseUrl}/_debug_sitemap_id_${String(id)}_idx_${idx}_type_${typeof id}`,
+    lastModified: new Date(),
+    changeFrequency: "daily",
+    priority: 0.0,
+  });
+
+  return entries;
 }
