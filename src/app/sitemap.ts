@@ -84,10 +84,12 @@ async function sitemapPatents(baseUrl: string): Promise<MetadataRoute.Sitemap> {
 const SITEMAP_HANDLERS = [sitemapStatic, sitemapDrugs, sitemapPatents];
 
 export default async function sitemap(
-  // Next.js 15+ wraps params in a Promise — must await before use
-  params: { id: number } | Promise<{ id: number }>
+  // Next.js 15+ params are a proxy — each property is a Promise
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any
 ): Promise<MetadataRoute.Sitemap> {
-  const { id } = await (params as Promise<{ id: number }>);
+  // Await the individual property — works whether it's a Promise or plain value
+  const id = Number(await Promise.resolve(params.id));
 
   // Detect real host from request headers so sitemap URLs always match the
   // actual deployment domain — avoids domain mismatch when env var differs.
@@ -96,6 +98,6 @@ export default async function sitemap(
   const proto = h.get("x-forwarded-proto") || "https";
   const baseUrl = `${proto}://${host}`;
 
-  const handler = SITEMAP_HANDLERS[Number(id)] ?? sitemapPatents;
+  const handler = SITEMAP_HANDLERS[id] ?? sitemapPatents;
   return handler(baseUrl);
 }
