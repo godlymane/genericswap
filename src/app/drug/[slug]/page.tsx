@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import Link from "next/link";
 import BreadcrumbNav from "@/components/BreadcrumbNav";
 import DrugInfoCard from "@/components/DrugInfoCard";
 import ComparisonTable from "@/components/ComparisonTable";
@@ -30,8 +31,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const generics = await getGenericEquivalents(drug.activeIngredient, drug.dosageForm, drug.route);
 
   return generateMeta({
-    title: `Generic for ${drug.tradeName} (${drug.activeIngredient}) — ${generics.length} FDA-Approved Alternatives`,
-    description: `Find all ${generics.length} FDA-approved generic alternatives for ${drug.tradeName} (${drug.activeIngredient.toLowerCase()}). Compare manufacturers, therapeutic equivalence ratings, and approval dates.`,
+    title: `Generic Alternative to ${drug.tradeName} (${drug.activeIngredient}) — ${generics.length} Options`,
+    description: `Looking for the cheapest generic for ${drug.tradeName}? Compare ${generics.length} FDA-approved generic alternatives for ${drug.activeIngredient.toLowerCase()}, including patent expiry dates, therapeutic equivalence ratings, and manufacturer info.`,
     url: `/drug/${slug}`,
   });
 }
@@ -225,6 +226,31 @@ export default async function DrugPage({ params }: PageProps) {
           drugName={drug.tradeName}
         />
       </ScrollReveal>
+
+      {/* Patent Expiry Deep-dive Link */}
+      {(drug.patents.length > 0 || drug.exclusivities.length > 0) && (
+        <div className="mt-4 text-center">
+          <Link
+            href={`/drug/${slug}/patent-expiry`}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700 hover:underline transition-colors"
+          >
+            View full {drug.tradeName} patent expiration &amp; exclusivity details
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
+        </div>
+      )}
+
+      {/* Internal Link to Generic Ingredient Page */}
+      <div className="mt-6 flex flex-wrap gap-3 text-sm">
+        <Link
+          href={`/generic/${drug.activeIngredient.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`}
+          className="text-gray-500 hover:text-brand-600 hover:underline transition-colors"
+        >
+          All {drug.activeIngredient} brands &amp; manufacturers &rarr;
+        </Link>
+      </div>
 
       {/* Ad Slot 2 */}
       <AdSlot slot="in-content-2" />

@@ -124,5 +124,33 @@ export function generateDrugFAQs({
     });
   }
 
+  // Q6: Cheapest generic (long-tail keyword target)
+  if (genericCount > 0) {
+    faqs.push({
+      question: `What is the cheapest generic for ${tradeName}?`,
+      answer: `Generic ${activeIngredient.toLowerCase()} is available from ${genericCount} manufacturer${genericCount !== 1 ? "s" : ""}, and pricing varies by pharmacy and insurance plan. Generally, generics cost 80-85% less than brand-name ${tradeName}. Ask your pharmacist to compare prices across manufacturers for the best deal.`,
+    });
+  }
+
+  // Q7: Brand vs generic comparison (long-tail keyword target)
+  if (genericCount > 0) {
+    faqs.push({
+      question: `Is generic ${activeIngredient.toLowerCase()} as good as ${tradeName}?`,
+      answer: `Yes. FDA-approved generics of ${tradeName} must contain the same active ingredient (${activeIngredient.toLowerCase()}), at the same dose and strength, and work the same way in the body. The FDA requires generics to meet strict bioequivalence standards before approval.`,
+    });
+  }
+
+  // Q8: How to switch (long-tail keyword target)
+  if (genericCount > 0) {
+    faqs.push({
+      question: `How do I switch from ${tradeName} to a generic alternative?`,
+      answer: `Talk to your doctor or pharmacist about switching to generic ${activeIngredient.toLowerCase()}. ${
+        hasABRating
+          ? `Since AB-rated generics are available, your pharmacist can typically make the substitution automatically.`
+          : `Your doctor can write a new prescription specifying the generic, or your pharmacist may be able to substitute depending on your state's laws.`
+      }`,
+    });
+  }
+
   return faqs;
 }

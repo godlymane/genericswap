@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!drug) return {};
 
   return generateMeta({
-    title: `${drug.tradeName} Patent Expiration & Exclusivity Timeline`,
-    description: `View patent expiration dates and exclusivity periods for ${drug.tradeName} (${drug.activeIngredient}). See when generic versions become available.`,
+    title: `${drug.tradeName} Patent Expiry Date — When Does the Patent Expire?`,
+    description: `${drug.tradeName} (${drug.activeIngredient}) patent expiration dates and exclusivity timeline. Find out when ${drug.tradeName} goes generic and cheaper alternatives become available.`,
     url: `/drug/${slug}/patent-expiry`,
   });
 }

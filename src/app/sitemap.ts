@@ -37,6 +37,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  // Patent expiry pages (one per drug)
+  const patentExpiryPages: MetadataRoute.Sitemap = drugSlugs.map((d) => ({
+    url: `${baseUrl}/drug/${d.slug}/patent-expiry`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }));
+
   // Unique active ingredients for generic pages
   const ingredients = await prisma.drug.findMany({
     select: { activeIngredient: true },
@@ -53,5 +61,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...categoryPages, ...drugPages, ...genericPages];
+  return [...staticPages, ...categoryPages, ...drugPages, ...patentExpiryPages, ...genericPages];
 }

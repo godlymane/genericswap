@@ -6,6 +6,7 @@ import ScoreBadge from "@/components/ScoreBadge";
 import AdSlot from "@/components/AdSlot";
 import AffiliateCTA from "@/components/AffiliateCTA";
 import { generateMeta, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { DRUG_CATEGORIES } from "@/lib/constants";
 import prisma from "@/lib/db";
 
 export const revalidate = 604800;
@@ -31,8 +32,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const ingredient = drugs[0].activeIngredient;
 
   return generateMeta({
-    title: `${ingredient} — All Brands & Generic Manufacturers`,
-    description: `Find all FDA-approved brand and generic versions of ${ingredient.toLowerCase()}. Compare manufacturers, strengths, and therapeutic equivalence ratings.`,
+    title: `${ingredient} Generic vs Brand — All FDA-Approved Manufacturers`,
+    description: `Compare all FDA-approved generic and brand versions of ${ingredient.toLowerCase()}. See manufacturers, strengths, therapeutic equivalence ratings, and the cheapest generic options available.`,
     url: `/generic/${slug}`,
   });
 }
@@ -56,7 +57,23 @@ export default async function GenericIngredientPage({ params }: PageProps) {
   const strengths = [...new Set(drugs.map((d) => d.strength).filter(Boolean))];
   const dosageForms = [...new Set(drugs.map((d) => d.dosageForm).filter(Boolean))];
 
-  const breadcrumbs = [{ label: "Generics" }, { label: ingredient }];
+  // Determine category for internal linking
+  let categorySlug: string | undefined;
+  let categoryName: string | undefined;
+  for (const [cSlug, cat] of Object.entries(DRUG_CATEGORIES)) {
+    if (cat.keywords.some((kw) => ingredient.toLowerCase().includes(kw.toLowerCase()))) {
+      categorySlug = cSlug;
+      categoryName = cat.name;
+      break;
+    }
+  }
+
+  const breadcrumbs = [
+    ...(categorySlug && categoryName
+      ? [{ label: categoryName, href: `/category/${categorySlug}` }]
+      : []),
+    { label: ingredient },
+  ];
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -143,6 +160,27 @@ export default async function GenericIngredientPage({ params }: PageProps) {
           </div>
         </div>
       )}
+
+      {/* Category & Brand Drug Links */}
+      <div className="mt-8 flex flex-wrap gap-3 text-sm">
+        {categorySlug && categoryName && (
+          <Link
+            href={`/category/${categorySlug}`}
+            className="text-gray-500 hover:text-brand-600 hover:underline transition-colors"
+          >
+            Browse all {categoryName} &rarr;
+          </Link>
+        )}
+        {brandDrugs.map((drug) => (
+          <Link
+            key={drug.id}
+            href={`/drug/${drug.slug}`}
+            className="text-gray-500 hover:text-brand-600 hover:underline transition-colors"
+          >
+            {drug.tradeName} generic alternatives &rarr;
+          </Link>
+        ))}
+      </div>
 
       <AdSlot slot="below-content" format="horizontal" />
 
