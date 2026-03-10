@@ -83,7 +83,12 @@ async function sitemapPatents(baseUrl: string): Promise<MetadataRoute.Sitemap> {
 // passes a string instead of a number
 const SITEMAP_HANDLERS = [sitemapStatic, sitemapDrugs, sitemapPatents];
 
-export default async function sitemap({ id }: { id: number }): Promise<MetadataRoute.Sitemap> {
+export default async function sitemap(
+  // Next.js 15+ wraps params in a Promise — must await before use
+  params: { id: number } | Promise<{ id: number }>
+): Promise<MetadataRoute.Sitemap> {
+  const { id } = await (params as Promise<{ id: number }>);
+
   // Detect real host from request headers so sitemap URLs always match the
   // actual deployment domain — avoids domain mismatch when env var differs.
   const h = await headers();
@@ -91,19 +96,6 @@ export default async function sitemap({ id }: { id: number }): Promise<MetadataR
   const proto = h.get("x-forwarded-proto") || "https";
   const baseUrl = `${proto}://${host}`;
 
-  const idx = Number(id);
-  const handler = SITEMAP_HANDLERS[idx] ?? sitemapPatents;
-  const entries = await handler(baseUrl);
-
-  // Temporary debug marker — prepend a URL that reveals routing info
-  // so we can diagnose which handler was actually called.
-  // REMOVE THIS after confirming sitemaps route correctly.
-  entries.unshift({
-    url: `${baseUrl}/_debug_sitemap_id_${String(id)}_idx_${idx}_type_${typeof id}`,
-    lastModified: new Date(),
-    changeFrequency: "daily",
-    priority: 0.0,
-  });
-
-  return entries;
+  const handler = SITEMAP_HANDLERS[Number(id)] ?? sitemapPatents;
+  return handler(baseUrl);
 }
