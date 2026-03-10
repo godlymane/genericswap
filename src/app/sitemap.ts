@@ -3,9 +3,6 @@ import { headers } from "next/headers";
 import prisma from "@/lib/db";
 import { DRUG_CATEGORIES } from "@/lib/constants";
 
-// Force dynamic rendering — prevents Vercel from serving stale build-time cache
-export const dynamic = "force-dynamic";
-
 // Next.js sitemap index — splits into /sitemap/0.xml, /sitemap/1.xml, /sitemap/2.xml
 // Google limit: 50,000 URLs per sitemap file
 export async function generateSitemaps() {

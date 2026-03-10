@@ -102,11 +102,16 @@ export const POPULAR_DRUGS = [
 
 export const SITE_NAME = "GenericSwap";
 
-// On Vercel, prefer the auto-detected production URL so sitemaps / canonical
-// URLs always match the real deployment domain.  NEXT_PUBLIC_SITE_URL is only
-// used for local dev or non-Vercel deployments.
-export const SITE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+// SITE_URL controls build-time metadataBase (sitemap index, canonical URLs).
+// Child sitemaps use headers() at runtime for the actual domain, so this only
+// matters for the statically-generated sitemap index.
+//
+// On Vercel the NEXT_PUBLIC_SITE_URL env var may be set to a custom domain
+// whose DNS isn't pointed yet (e.g. genericswap.com).  In that case, fall back
+// to the known working .vercel.app URL.
+// TODO: once genericswap.com DNS is live, remove the VERCEL guard.
+export const SITE_URL = process.env.VERCEL
+  ? "https://genericswap.vercel.app"
   : process.env.NEXT_PUBLIC_SITE_URL || "https://genericswap.vercel.app";
 
 export const SITE_DESCRIPTION = "Find FDA-approved generic alternatives for any brand-name drug. Compare manufacturers, therapeutic equivalence ratings, patent timelines, and prices.";
