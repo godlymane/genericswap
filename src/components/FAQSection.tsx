@@ -5,25 +5,47 @@ interface FAQItem {
 
 export default function FAQSection({ items, drugName }: { items: FAQItem[]; drugName: string }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        Frequently Asked Questions About {drugName}
-      </h3>
-      <div className="space-y-3">
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg shadow-gray-100/50">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">
+              Frequently Asked Questions
+            </h3>
+            <p className="text-sm text-gray-500">About {drugName} and its generic alternatives</p>
+          </div>
+        </div>
+      </div>
+
+      {/* FAQ Items */}
+      <div className="divide-y divide-gray-100">
         {items.map((item, i) => (
-          <details key={i} className="group border border-gray-100 rounded-lg">
-            <summary className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-gray-50 rounded-lg">
+          <details key={i} className="group">
+            <summary className="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50/80 transition-colors">
               <span className="font-medium text-gray-900 text-sm pr-4">{item.question}</span>
-              <svg
-                className="faq-chevron w-5 h-5 text-gray-400 flex-shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
+              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 group-hover:bg-violet-100 transition-colors">
+                <svg
+                  className="faq-chevron w-4 h-4 text-gray-500 group-hover:text-violet-600 transition-colors"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
             </summary>
-            <div className="px-4 pb-4 text-sm text-gray-700 leading-relaxed">{item.answer}</div>
+            <div className="px-6 pb-5 text-sm text-gray-700 leading-relaxed">
+              <div className="pl-0 border-l-2 border-violet-200 ml-0 pl-4">
+                {item.answer}
+              </div>
+            </div>
           </details>
         ))}
       </div>

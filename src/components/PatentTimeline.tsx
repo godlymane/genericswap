@@ -42,8 +42,15 @@ export default function PatentTimeline({
 }: PatentTimelineProps) {
   if (patents.length === 0 && exclusivities.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Patent & Exclusivity Timeline</h3>
+      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg shadow-gray-100/50 p-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900">Patent & Exclusivity Timeline</h3>
+        </div>
         <p className="text-gray-500 text-sm">No patent or exclusivity data available for {drugName}.</p>
       </div>
     );
@@ -86,17 +93,38 @@ export default function PatentTimeline({
 
   if (chartData.length === 0) {
     return (
-      <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Patent & Exclusivity Timeline</h3>
+      <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg shadow-gray-100/50 p-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-bold text-gray-900">Patent & Exclusivity Timeline</h3>
+        </div>
         <p className="text-gray-500 text-sm">No displayable timeline data for {drugName}.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Patent & Exclusivity Timeline</h3>
+    <div className="relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg shadow-gray-100/50">
+      {/* Header */}
+      <div className="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100 flex items-center justify-center">
+            <svg className="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Patent & Exclusivity Timeline</h3>
+            <p className="text-sm text-gray-500">{validPatents.length} patent{validPatents.length !== 1 ? "s" : ""} · {exclusivities.filter(e => e.exclusivityDate).length} exclusivit{exclusivities.filter(e => e.exclusivityDate).length !== 1 ? "ies" : "y"}</p>
+          </div>
+        </div>
+      </div>
 
+      <div className="p-6">
       <div className="h-64 sm:h-80">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} layout="vertical" margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -147,23 +175,24 @@ export default function PatentTimeline({
       </div>
 
       <div className="mt-4 flex flex-wrap gap-4 text-xs text-gray-600">
-        <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-blue-500 inline-block" /> Active Patent
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-blue-500 inline-block" /> Active Patent
         </span>
-        <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-yellow-400 inline-block" /> Active Exclusivity
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-yellow-400 inline-block" /> Active Exclusivity
         </span>
-        <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-gray-300 inline-block" /> Expired
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-sm bg-gray-300 inline-block" /> Expired
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1.5">
           <span className="w-3 h-1 border-t-2 border-dashed border-red-500 inline-block" /> Today
         </span>
         {firstGenericDate && (
-          <span className="flex items-center gap-1">
+          <span className="flex items-center gap-1.5">
             <span className="w-3 h-1 border-t-2 border-dashed border-green-500 inline-block" /> First Generic
           </span>
         )}
+      </div>
       </div>
     </div>
   );

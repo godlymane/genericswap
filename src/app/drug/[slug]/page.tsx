@@ -10,6 +10,7 @@ import RelatedDrugs from "@/components/RelatedDrugs";
 import AdSlot from "@/components/AdSlot";
 import SwitchScore from "@/components/SwitchScore";
 import NewsletterSignup from "@/components/NewsletterSignup";
+import ScrollReveal from "@/components/ScrollReveal";
 import { getDrugBySlug, getGenericEquivalents, getRelatedDrugs, getAllBrandDrugSlugs, countGenerics } from "@/lib/queries";
 import { generateMeta, buildBreadcrumbJsonLd, buildFAQJsonLd, buildMedicalWebPageJsonLd } from "@/lib/seo";
 import { calculateSwitchScore, estimateAnnualSavings } from "@/lib/scoring";
@@ -134,28 +135,32 @@ export default async function DrugPage({ params }: PageProps) {
       <BreadcrumbNav items={breadcrumbs} />
 
       {/* Page Title */}
-      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
-        Generic Alternatives for {drug.tradeName}
-      </h1>
-      <p className="text-gray-600 mb-8">
-        {drug.activeIngredient}
-        {drug.dosageForm && ` \u00b7 ${drug.dosageForm}`}
-        {drug.route && ` \u00b7 ${drug.route}`}
-      </p>
+      <div className="animate-fade-up">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+          Generic Alternatives for {drug.tradeName}
+        </h1>
+        <p className="text-gray-600 mb-8">
+          {drug.activeIngredient}
+          {drug.dosageForm && ` \u00b7 ${drug.dosageForm}`}
+          {drug.route && ` \u00b7 ${drug.route}`}
+        </p>
+      </div>
 
       {/* Drug Info Card */}
-      <DrugInfoCard
-        tradeName={drug.tradeName}
-        activeIngredient={drug.activeIngredient}
-        applicant={drug.applicant}
-        approvalDate={drug.approvalDate ? new Date(drug.approvalDate) : null}
-        dosageForm={drug.dosageForm}
-        route={drug.route}
-        strength={drug.strength}
-        teCode={drug.teCode}
-        genericCount={generics.length}
-        isDiscontinued={drug.isDiscontinued}
-      />
+      <ScrollReveal animation="fade-up" delay={0.1}>
+        <DrugInfoCard
+          tradeName={drug.tradeName}
+          activeIngredient={drug.activeIngredient}
+          applicant={drug.applicant}
+          approvalDate={drug.approvalDate ? new Date(drug.approvalDate) : null}
+          dosageForm={drug.dosageForm}
+          route={drug.route}
+          strength={drug.strength}
+          teCode={drug.teCode}
+          genericCount={generics.length}
+          isDiscontinued={drug.isDiscontinued}
+        />
+      </ScrollReveal>
 
       {/* GenericSwap Score */}
       <div className="mt-8">
@@ -175,28 +180,37 @@ export default async function DrugPage({ params }: PageProps) {
       <AdSlot id="ad-in-content-1" />
 
       {/* Generic Equivalents Table */}
-      {generics.length > 0 ? (
-        <div className="mt-8">
+      <ScrollReveal animation="fade-up" className="mt-8">
+        {generics.length > 0 ? (
           <ComparisonTable
             generics={generics.map((g) => ({
               ...g,
               approvalDate: g.approvalDate ? new Date(g.approvalDate) : null,
             }))}
           />
-        </div>
-      ) : (
-        <div className="mt-8 bg-yellow-50 border border-yellow-200 rounded-xl p-6">
-          <h3 className="font-semibold text-yellow-800">No Generic Available</h3>
-          <p className="text-sm text-yellow-700 mt-1">
-            There are currently no FDA-approved generic alternatives for {drug.tradeName}. This may
-            be due to active patent protection or market exclusivity. Check the patent timeline below
-            for more details.
-          </p>
-        </div>
-      )}
+        ) : (
+          <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-2xl p-6">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-semibold text-amber-800">No Generic Available</h3>
+                <p className="text-sm text-amber-700 mt-1">
+                  There are currently no FDA-approved generic alternatives for {drug.tradeName}. This may
+                  be due to active patent protection or market exclusivity. Check the patent timeline below
+                  for more details.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </ScrollReveal>
 
       {/* Patent Timeline */}
-      <div className="mt-8">
+      <ScrollReveal animation="fade-up" className="mt-8">
         <PatentTimeline
           patents={drug.patents.map((p) => ({
             ...p,
@@ -210,42 +224,42 @@ export default async function DrugPage({ params }: PageProps) {
           firstGenericDate={firstGenericDate}
           drugName={drug.tradeName}
         />
-      </div>
+      </ScrollReveal>
 
       {/* Ad Slot 2 */}
       <AdSlot id="ad-in-content-2" />
 
       {/* Affiliate CTA */}
       {generics.length > 0 && (
-        <div className="mt-8">
+        <ScrollReveal animation="scale-in" className="mt-8">
           <AffiliateCTA
             activeIngredient={drug.activeIngredient}
             tradeName={drug.tradeName}
           />
-        </div>
+        </ScrollReveal>
       )}
 
       {/* FAQ Section */}
-      <div className="mt-8">
+      <ScrollReveal animation="fade-up" className="mt-8">
         <FAQSection items={faqItems} drugName={drug.tradeName} />
-      </div>
+      </ScrollReveal>
 
       {/* Related Drugs */}
       {relatedDrugs.length > 0 && (
-        <div className="mt-8">
+        <ScrollReveal animation="slide-left" className="mt-8">
           <RelatedDrugs
             drugs={relatedDrugs}
             currentDrug={drug.tradeName}
             categorySlug={categorySlug}
             categoryName={categoryName}
           />
-        </div>
+        </ScrollReveal>
       )}
 
       {/* Newsletter Signup */}
-      <div className="mt-8">
+      <ScrollReveal animation="fade-up" className="mt-8">
         <NewsletterSignup variant="card" />
-      </div>
+      </ScrollReveal>
 
       {/* Ad Slot 3 */}
       <AdSlot id="ad-below-content" />

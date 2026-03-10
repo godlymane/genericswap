@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_DESCRIPTION, SITE_URL } from "@/lib/constants";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { Toaster } from "sonner";
 import "@/styles/globals.css";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <head>
         {process.env.NEXT_PUBLIC_GA_ID && (
           <>
@@ -49,7 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </>
         )}
       </head>
-      <body className="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+      <body className="bg-gray-50 text-gray-900 min-h-screen flex flex-col antialiased">
         <Header />
 
         {/* Main content */}
@@ -62,11 +63,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="bg-gray-100 border-t border-gray-200 py-2 text-center text-xs text-gray-500">
           GenericSwap provides FDA public data for informational purposes only. This is not medical
           advice.{" "}
-          <a href="/disclaimer" className="underline">
+          <a href="/disclaimer" className="underline hover:text-gray-700 transition-colors">
             Read our full disclaimer
           </a>
           .
         </div>
+
+        {/* Toast notifications */}
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              borderRadius: "12px",
+              fontSize: "14px",
+            },
+          }}
+        />
       </body>
     </html>
   );
