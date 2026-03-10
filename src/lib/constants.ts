@@ -101,5 +101,5 @@ export const POPULAR_DRUGS = [
 ];
 
 export const SITE_NAME = "GenericSwap";
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://genericswap.com";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://genericswap.vercel.app";
 export const SITE_DESCRIPTION = "Find FDA-approved generic alternatives for any brand-name drug. Compare manufacturers, therapeutic equivalence ratings, patent timelines, and prices.";
