@@ -101,5 +101,12 @@ export const POPULAR_DRUGS = [
 ];
 
 export const SITE_NAME = "GenericSwap";
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://genericswap.vercel.app";
+
+// On Vercel, prefer the auto-detected production URL so sitemaps / canonical
+// URLs always match the real deployment domain.  NEXT_PUBLIC_SITE_URL is only
+// used for local dev or non-Vercel deployments.
+export const SITE_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : process.env.NEXT_PUBLIC_SITE_URL || "https://genericswap.vercel.app";
+
 export const SITE_DESCRIPTION = "Find FDA-approved generic alternatives for any brand-name drug. Compare manufacturers, therapeutic equivalence ratings, patent timelines, and prices.";
