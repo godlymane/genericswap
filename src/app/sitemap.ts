@@ -1,7 +1,14 @@
 import { MetadataRoute } from "next";
 import { headers } from "next/headers";
-import prisma from "@/lib/db";
 import { DRUG_CATEGORIES } from "@/lib/constants";
+
+// Lazy-import prisma so the module can be evaluated at build time
+// without a database connection — generateSitemaps() must work at
+// build time for Next.js to produce a proper sitemap index.
+async function db() {
+  const { default: prisma } = await import("@/lib/db");
+  return prisma;
+}
 
 // Next.js sitemap index — splits into /sitemap/0.xml, /sitemap/1.xml, /sitemap/2.xml
 // Google limit: 50,000 URLs per sitemap file
@@ -28,6 +35,7 @@ async function sitemapStatic(baseUrl: string): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const prisma = await db();
   const ingredients = await prisma.drug.findMany({
     select: { activeIngredient: true },
     distinct: ["activeIngredient"],
@@ -47,6 +55,7 @@ async function sitemapStatic(baseUrl: string): Promise<MetadataRoute.Sitemap> {
 }
 
 async function sitemapDrugs(baseUrl: string): Promise<MetadataRoute.Sitemap> {
+  const prisma = await db();
   const drugSlugs = await prisma.drug.findMany({
     select: { slug: true },
     distinct: ["slug"],
@@ -62,6 +71,7 @@ async function sitemapDrugs(baseUrl: string): Promise<MetadataRoute.Sitemap> {
 }
 
 async function sitemapPatents(baseUrl: string): Promise<MetadataRoute.Sitemap> {
+  const prisma = await db();
   const drugSlugs = await prisma.drug.findMany({
     select: { slug: true },
     distinct: ["slug"],
