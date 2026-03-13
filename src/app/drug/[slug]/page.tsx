@@ -12,12 +12,13 @@ import AdSlot from "@/components/AdSlot";
 import SwitchScore from "@/components/SwitchScore";
 import NewsletterSignup from "@/components/NewsletterSignup";
 import ScrollReveal from "@/components/ScrollReveal";
+import SaveDrug from "@/components/SaveDrug";
 import { getDrugBySlug, getGenericEquivalents, getRelatedDrugs, getAllBrandDrugSlugs, countGenerics } from "@/lib/queries";
 import { generateMeta, buildBreadcrumbJsonLd, buildFAQJsonLd, buildMedicalWebPageJsonLd } from "@/lib/seo";
 import { calculateSwitchScore, estimateAnnualSavings } from "@/lib/scoring";
 import { DRUG_CATEGORIES, SITE_NAME } from "@/lib/constants";
 
-export const revalidate = 604800; // Weekly
+export const revalidate = 86400; // OPTIMIZED: 24h ISR for fresh data
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -140,11 +141,13 @@ export default async function DrugPage({ params }: PageProps) {
         <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
           Generic Alternatives for {drug.tradeName}
         </h1>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-600 mb-4">
           {drug.activeIngredient}
           {drug.dosageForm && ` \u00b7 ${drug.dosageForm}`}
           {drug.route && ` \u00b7 ${drug.route}`}
         </p>
+        {/* OPTIMIZED: Save drug bookmark for user retention */}
+        <SaveDrug slug={slug} tradeName={drug.tradeName} activeIngredient={drug.activeIngredient} />
       </div>
 
       {/* Drug Info Card */}

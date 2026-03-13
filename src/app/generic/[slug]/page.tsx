@@ -5,11 +5,11 @@ import BreadcrumbNav from "@/components/BreadcrumbNav";
 import ScoreBadge from "@/components/ScoreBadge";
 import AdSlot from "@/components/AdSlot";
 import AffiliateCTA from "@/components/AffiliateCTA";
-import { generateMeta, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { generateMeta, buildBreadcrumbJsonLd, buildFAQJsonLd, buildMedicalWebPageJsonLd } from "@/lib/seo";
 import { DRUG_CATEGORIES } from "@/lib/constants";
 import prisma from "@/lib/db";
 
-export const revalidate = 604800;
+export const revalidate = 86400; // OPTIMIZED: 24h ISR for fresh data
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -74,6 +74,14 @@ export default async function GenericIngredientPage({ params }: PageProps) {
       : []),
     { label: ingredient },
   ];
+
+  const pageJsonLd = buildMedicalWebPageJsonLd({
+    title: `${ingredient} — Generic & Brand Options`,
+    description: `All FDA-approved generic and brand versions of ${ingredient}`,
+    url: `/generic/${slug}`,
+    drugName: ingredient,
+    activeIngredient: ingredient,
+  });
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -191,6 +199,11 @@ export default async function GenericIngredientPage({ params }: PageProps) {
             buildBreadcrumbJsonLd(breadcrumbs.map((b) => ({ name: b.label, url: `/generic/${slug}` })))
           ),
         }}
+      />
+      {/* OPTIMIZED: Drug structured data for rich search results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
       />
     </div>
   );

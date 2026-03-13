@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
+import { rateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
+  // OPTIMIZED: Rate limit subscription API (5 requests/minute per IP)
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  const rl = rateLimit(`subscribe:${ip}`, { limit: 5 });
+  if (!rl.success) return rateLimitResponse();
+
   try {
     const body = await request.json();
     const { email, drugSlug, activeIngredient, alertType } = body;

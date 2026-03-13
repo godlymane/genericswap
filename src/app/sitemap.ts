@@ -26,6 +26,13 @@ async function sitemapStatic(baseUrl: string): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.2 },
     { url: `${baseUrl}/disclaimer`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
     { url: `${baseUrl}/contact`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.2 },
+    // OPTIMIZED: Include all revenue-generating pages in sitemap
+    { url: `${baseUrl}/trending`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.7 },
+    { url: `${baseUrl}/patent-cliffs`, lastModified: new Date(), changeFrequency: "weekly" as const, priority: 0.7 },
+    { url: `${baseUrl}/state-laws`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.6 },
+    { url: `${baseUrl}/search`, lastModified: new Date(), changeFrequency: "daily" as const, priority: 0.5 },
+    { url: `${baseUrl}/advanced`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.5 },
+    { url: `${baseUrl}/api-docs`, lastModified: new Date(), changeFrequency: "monthly" as const, priority: 0.4 },
   ];
 
   const categoryPages: MetadataRoute.Sitemap = Object.keys(DRUG_CATEGORIES).map((slug) => ({

@@ -66,8 +66,9 @@ export default function AdSlot({
 
   if (!pubId) return null;
 
+  // OPTIMIZED: min-height prevents CLS when ads load
   return (
-    <div ref={ref} className={`ad-slot my-8 ${className}`} aria-hidden="true">
+    <div ref={ref} className={`ad-slot my-8 ${className}`} style={{ minHeight: format === "horizontal" ? 90 : format === "rectangle" ? 250 : 100 }} aria-hidden="true">
       {isVisible && hasConsent && (
         <ins
           className="adsbygoogle"

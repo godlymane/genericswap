@@ -8,7 +8,7 @@ import { generateMeta, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { EXCLUSIVITY_CODES } from "@/lib/constants";
 import Link from "next/link";
 
-export const revalidate = 604800;
+export const revalidate = 86400; // OPTIMIZED: 24h ISR for fresh data
 
 interface PageProps {
   params: Promise<{ slug: string }>;

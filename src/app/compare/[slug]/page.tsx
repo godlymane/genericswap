@@ -7,10 +7,11 @@ import AdSlot from "@/components/AdSlot";
 import AffiliateCTA from "@/components/AffiliateCTA";
 import FAQSection from "@/components/FAQSection";
 import { generateMeta, buildBreadcrumbJsonLd, buildFAQJsonLd } from "@/lib/seo";
+import { SITE_NAME, SITE_URL } from "@/lib/constants";
 import prisma from "@/lib/db";
 import { countGenerics } from "@/lib/queries";
 
-export const revalidate = 604800;
+export const revalidate = 86400; // OPTIMIZED: 24h ISR for fresh data
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -89,6 +90,28 @@ export default async function ComparePage({ params }: PageProps) {
         : `No, ${drug2.tradeName} is not a generic version of ${drug1.tradeName}. They ${isSameIngredient ? "contain the same active ingredient but are marketed separately" : "contain different active ingredients"}.`,
     },
   ];
+
+  const pageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "MedicalWebPage",
+    name: `${drug1.tradeName} vs ${drug2.tradeName}`,
+    description: `Compare ${drug1.tradeName} and ${drug2.tradeName} — side-by-side FDA data`,
+    url: `${SITE_URL}/compare/${slug}`,
+    about: [
+      {
+        "@type": "Drug",
+        name: drug1.tradeName,
+        activeIngredient: { "@type": "Substance", name: drug1.activeIngredient },
+      },
+      {
+        "@type": "Drug",
+        name: drug2.tradeName,
+        activeIngredient: { "@type": "Substance", name: drug2.activeIngredient },
+      },
+    ],
+    isPartOf: { "@type": "WebSite", name: SITE_NAME, url: SITE_URL },
+    lastReviewed: new Date().toISOString().split("T")[0],
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
@@ -187,6 +210,24 @@ export default async function ComparePage({ params }: PageProps) {
         </p>
       </div>
 
+      {/* OPTIMIZED: Internal links for SEO crawl depth */}
+      <div className="mt-6 flex flex-wrap gap-3 text-sm">
+        <Link
+          href={`/generic/${drug1.activeIngredient.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`}
+          className="text-gray-500 hover:text-brand-600 hover:underline transition-colors"
+        >
+          All {drug1.activeIngredient} options &rarr;
+        </Link>
+        {drug1.activeIngredient !== drug2.activeIngredient && (
+          <Link
+            href={`/generic/${drug2.activeIngredient.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`}
+            className="text-gray-500 hover:text-brand-600 hover:underline transition-colors"
+          >
+            All {drug2.activeIngredient} options &rarr;
+          </Link>
+        )}
+      </div>
+
       <AdSlot slot="in-content-2" />
 
       {/* Affiliate */}
@@ -215,6 +256,11 @@ export default async function ComparePage({ params }: PageProps) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFAQJsonLd(faqItems)) }}
+      />
+      {/* OPTIMIZED: MedicalWebPage structured data for compare pages */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(pageJsonLd) }}
       />
     </div>
   );

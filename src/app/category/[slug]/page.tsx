@@ -7,7 +7,7 @@ import { generateMeta, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { DRUG_CATEGORIES } from "@/lib/constants";
 import { getBrandDrugsWithGenericCounts } from "@/lib/queries";
 
-export const revalidate = 604800;
+export const revalidate = 86400; // OPTIMIZED: 24h ISR for fresh data
 
 interface PageProps {
   params: Promise<{ slug: string }>;
