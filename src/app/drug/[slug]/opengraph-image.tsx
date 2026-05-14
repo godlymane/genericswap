@@ -65,7 +65,7 @@ export default async function OGImage({ params }: { params: Promise<{ slug: stri
             </div>
             <span style={{ color: "white", fontSize: 24, fontWeight: 700 }}>GenericSwap</span>
           </div>
-          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 16 }}>genericswap.com</span>
+          <span style={{ color: "rgba(255,255,255,0.7)", fontSize: 16 }}>genericswap.vercel.app</span>
         </div>
 
         {/* Content */}

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { SITE_NAME } from "@/lib/constants";
 
 const NAV_LINKS = [
+  { href: "/guides", label: "Guides" },
   { href: "/search/advanced", label: "Advanced Search" },
   { href: "/patent-cliffs", label: "Patent Cliffs" },
   { href: "/trending", label: "Trending" },

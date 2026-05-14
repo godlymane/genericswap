@@ -46,8 +46,18 @@ export default function AboutPage() {
           <li>Therapeutic equivalence ratings (TE codes) explaining substitutability</li>
           <li>Patent expiration timelines showing when generics become available</li>
           <li>Manufacturer information for all approved generic versions</li>
-          <li>Links to compare drug prices across pharmacies</li>
+          <li>Original guides that explain how to discuss substitutions and savings with a pharmacist</li>
         </ul>
+
+        <h2 className="text-xl font-semibold text-gray-900 mt-8">How We Review Content</h2>
+        <p>
+          Our database pages organize public FDA information, while our guides add original
+          explanations, checklists, and context for consumers. Read our{" "}
+          <Link href="/editorial-policy" className="text-brand-600 hover:underline">
+            editorial policy
+          </Link>{" "}
+          for details about sourcing, updates, corrections, advertising, and medical limits.
+        </p>
 
         <h2 className="text-xl font-semibold text-gray-900 mt-8">Important Notice</h2>
         <p>

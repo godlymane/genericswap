@@ -60,6 +60,11 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2">
               <li>
+                <Link href="/guides" className="text-sm hover:text-white transition-colors">
+                  Generic Drug Guides
+                </Link>
+              </li>
+              <li>
                 <Link href="/search/advanced" className="text-sm hover:text-white transition-colors">
                   Advanced Search
                 </Link>
@@ -87,6 +92,11 @@ export default function Footer() {
               <li>
                 <Link href="/about" className="text-sm hover:text-white transition-colors">
                   About
+                </Link>
+              </li>
+              <li>
+                <Link href="/editorial-policy" className="text-sm hover:text-white transition-colors">
+                  Editorial Policy
                 </Link>
               </li>
               <li>

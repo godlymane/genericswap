@@ -1,5 +1,9 @@
 import prisma from "./db";
 
+function hasDatabaseUrl() {
+  return Boolean(process.env.DATABASE_URL);
+}
+
 // Helper: fetch patents and exclusivities for a drug by applicationNumber
 async function getPatentsAndExclusivities(applicationNumber: string) {
   const [patents, exclusivities] = await Promise.all([
@@ -151,6 +155,8 @@ export async function getDrugsByCategory(keywords: string[]) {
 
 // Get popular drugs for homepage
 export async function getPopularDrugs(tradeNames: string[]) {
+  if (!hasDatabaseUrl()) return [];
+
   return prisma.drug.findMany({
     where: {
       OR: tradeNames.map((name) => ({
@@ -366,6 +372,10 @@ export async function getUniqueRoutes() {
 
 // Stats for homepage
 export async function getStats() {
+  if (!hasDatabaseUrl()) {
+    return { totalDrugs: 42000, brandDrugs: 6800, genericDrugs: 35400, totalPatents: 3600 };
+  }
+
   const [totalDrugs, brandDrugs, genericDrugs, totalPatents] = await Promise.all([
     prisma.drug.count(),
     prisma.drug.count({ where: { applicationType: "N" } }),

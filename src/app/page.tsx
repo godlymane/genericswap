@@ -7,7 +7,8 @@ import HeroStats from "@/components/HeroStats";
 import ScrollReveal from "@/components/ScrollReveal";
 import TrustBadges from "@/components/TrustBadges";
 import SocialProof from "@/components/SocialProof";
-import { DRUG_CATEGORIES, POPULAR_DRUGS, SITE_NAME } from "@/lib/constants";
+import { DRUG_CATEGORIES, POPULAR_DRUGS, SITE_NAME, SITE_URL } from "@/lib/constants";
+import { GUIDES } from "@/lib/guides";
 import { getPopularDrugs, getStats } from "@/lib/queries";
 import { generateMeta } from "@/lib/seo";
 
@@ -291,6 +292,53 @@ export default async function HomePage() {
       {/* ═══════════════════════════════════════════════
           SOCIAL PROOF — Stats + Testimonials
       ═══════════════════════════════════════════════ */}
+      <section className="bg-gray-50 py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <ScrollReveal>
+            <div className="flex items-end justify-between gap-4 mb-8">
+              <div>
+                <p className="text-sm font-semibold text-brand-600 uppercase tracking-wider mb-1">
+                  Guides
+                </p>
+                <h2 className="text-3xl font-bold text-gray-900">Learn Before You Switch</h2>
+                <p className="text-gray-500 mt-3 max-w-2xl">
+                  Original explainers for reading FDA data, understanding therapeutic equivalence,
+                  and preparing smarter questions for your pharmacist.
+                </p>
+              </div>
+              <Link
+                href="/guides"
+                className="hidden sm:flex text-sm text-brand-600 hover:text-brand-700 font-medium items-center gap-1 group"
+              >
+                View guides
+                <svg className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {GUIDES.slice(0, 3).map((guide, i) => (
+              <ScrollReveal key={guide.slug} delay={0.08 * i}>
+                <Link
+                  href={`/guides/${guide.slug}`}
+                  className="group block h-full bg-white border border-gray-200 rounded-xl p-6 hover:border-brand-300 hover:shadow-lg transition-all"
+                >
+                  <span className="text-xs font-semibold text-brand-700 bg-brand-50 px-2.5 py-1 rounded-full">
+                    {guide.category}
+                  </span>
+                  <h3 className="text-lg font-bold text-gray-900 group-hover:text-brand-700 transition-colors mt-4">
+                    {guide.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 leading-relaxed mt-3">{guide.description}</p>
+                </Link>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="max-w-5xl mx-auto px-4 py-16">
         <ScrollReveal>
           <SocialProof />
@@ -323,12 +371,12 @@ export default async function HomePage() {
             "@context": "https://schema.org",
             "@type": "WebSite",
             name: SITE_NAME,
-            url: "https://genericswap.com",
+            url: SITE_URL,
             potentialAction: {
               "@type": "SearchAction",
               target: {
                 "@type": "EntryPoint",
-                urlTemplate: "https://genericswap.com/search?q={search_term_string}",
+                urlTemplate: `${SITE_URL}/search?q={search_term_string}`,
               },
               "query-input": "required name=search_term_string",
             },

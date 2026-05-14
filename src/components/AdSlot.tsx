@@ -27,6 +27,12 @@ export default function AdSlot({
   const [hasConsent, setHasConsent] = useState(false);
 
   const pubId = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID;
+  const slotMap: Record<string, string | undefined> = {
+    "in-content-1": process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_CONTENT_1,
+    "in-content-2": process.env.NEXT_PUBLIC_ADSENSE_SLOT_IN_CONTENT_2,
+    "below-content": process.env.NEXT_PUBLIC_ADSENSE_SLOT_BELOW_CONTENT,
+  };
+  const slotId = /^\d+$/.test(slot) ? slot : slotMap[slot];
 
   // Listen for cookie consent
   useEffect(() => {
@@ -55,16 +61,16 @@ export default function AdSlot({
 
   // Push the ad once visible + consent given
   useEffect(() => {
-    if (!isVisible || !hasConsent || !pubId || pushed.current) return;
+    if (!isVisible || !hasConsent || !pubId || !slotId || pushed.current) return;
     try {
       (window.adsbygoogle = window.adsbygoogle || []).push({});
       pushed.current = true;
     } catch {
       // AdSense not loaded yet or ad blocker active
     }
-  }, [isVisible, hasConsent, pubId]);
+  }, [isVisible, hasConsent, pubId, slotId]);
 
-  if (!pubId) return null;
+  if (!pubId || !slotId) return null;
 
   // OPTIMIZED: min-height prevents CLS when ads load
   return (
@@ -74,7 +80,7 @@ export default function AdSlot({
           className="adsbygoogle"
           style={{ display: "block" }}
           data-ad-client={pubId}
-          data-ad-slot={slot}
+          data-ad-slot={slotId}
           data-ad-format={format}
           {...(responsive ? { "data-full-width-responsive": "true" } : {})}
         />

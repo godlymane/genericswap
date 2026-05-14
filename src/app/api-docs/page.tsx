@@ -1,4 +1,5 @@
 import { generateMeta } from "@/lib/seo";
+import { SITE_URL } from "@/lib/constants";
 
 export const metadata = generateMeta({
   title: "GenericSwap API Documentation — Free Drug Data API",
@@ -8,6 +9,8 @@ export const metadata = generateMeta({
 });
 
 export default function ApiDocsPage() {
+  const apiBaseUrl = `${SITE_URL}/api/v1`;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <div className="mb-8">
@@ -31,7 +34,7 @@ export default function ApiDocsPage() {
           <p className="text-gray-400"># Email: api@genericswap.com</p>
           <p className="mt-3 text-gray-400"># Include your API key in requests:</p>
           <p className="text-green-400">curl -H &quot;Authorization: Bearer gs_your_api_key&quot; \</p>
-          <p className="text-green-400 pl-4">https://genericswap.com/api/v1/drugs?limit=10</p>
+          <p className="text-green-400 pl-4">{apiBaseUrl}/drugs?limit=10</p>
         </div>
         <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800">
           <strong>Rate Limits:</strong> 100 requests/hour (free tier). Contact us for higher limits.
@@ -42,7 +45,7 @@ export default function ApiDocsPage() {
       <section className="mb-10">
         <h2 className="text-xl font-bold text-gray-900 mb-3">Base URL</h2>
         <code className="text-sm bg-gray-100 px-4 py-2 rounded-lg text-brand-700 font-mono block">
-          https://genericswap.com/api/v1
+          {apiBaseUrl}
         </code>
       </section>
 
@@ -139,7 +142,7 @@ export default function ApiDocsPage() {
         <div className="bg-gray-900 rounded-xl p-5 text-sm font-mono text-gray-100">
           <p className="text-gray-400">&lt;!-- Add to your HTML --&gt;</p>
           <p>&lt;iframe</p>
-          <p className="pl-4">src=&quot;https://genericswap.com/api/widget/lipitor&quot;</p>
+          <p className="pl-4">src=&quot;{SITE_URL}/api/widget/lipitor&quot;</p>
           <p className="pl-4">width=&quot;400&quot; height=&quot;300&quot;</p>
           <p className="pl-4">frameborder=&quot;0&quot;</p>
           <p className="pl-4">title=&quot;GenericSwap Drug Info&quot;</p>

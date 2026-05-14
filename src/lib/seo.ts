@@ -110,7 +110,9 @@ export function generateMeta({
 }) {
   const fullTitle = title.includes(SITE_NAME) ? title : `${title} | ${SITE_NAME}`;
   return {
-    title: fullTitle,
+    title: {
+      absolute: fullTitle,
+    },
     description,
     alternates: {
       canonical: `${SITE_URL}${url}`,

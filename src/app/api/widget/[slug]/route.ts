@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDrugBySlug, countGenerics } from "@/lib/queries";
 import { calculateSwitchScore, estimateAnnualSavings } from "@/lib/scoring";
+import { SITE_URL } from "@/lib/constants";
 
 export async function GET(
   request: NextRequest,
@@ -96,7 +97,7 @@ body{font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#1f293
     ${savings && savings.average > 0 ? `<div class="savings"><div class="amount">$${savings.average.toLocaleString()}/yr</div><div class="label">Estimated savings (${savings.percentSaved}% vs brand)</div></div>` : ""}
   </div>
   <div class="footer">
-    <a href="https://genericswap.com/drug/${tradeName.toLowerCase().replace(/\s+/g, "-")}" target="_blank" rel="noopener">
+    <a href="${SITE_URL}/drug/${tradeName.toLowerCase().replace(/\s+/g, "-")}" target="_blank" rel="noopener">
       View on GenericSwap →
     </a>
   </div>

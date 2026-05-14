@@ -15,7 +15,7 @@
     "compute": "tsx scripts/compute-relationships.ts",
     "generate-slugs": "tsx scripts/generate-slugs.ts",
     "setup": "tsx scripts/setup-db.ts",
-    "postbuild": "next-sitemap"
+    "check:adsense": "tsx scripts/adsense-readiness-check.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

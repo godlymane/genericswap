@@ -7,14 +7,11 @@ import { generateMeta, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { DRUG_CATEGORIES } from "@/lib/constants";
 import { getBrandDrugsWithGenericCounts } from "@/lib/queries";
 
+export const dynamic = "force-dynamic"; // Avoid build-time database dependency
 export const revalidate = 86400; // OPTIMIZED: 24h ISR for fresh data
 
 interface PageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  return Object.keys(DRUG_CATEGORIES).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
